@@ -24,13 +24,16 @@ class Game:
 
 def main():
     total_result: int = 0
+    total_power: int = 0
     data: list[str] = INPUT.splitlines()
     for line in data:
         games: list[str] = _get_games(line)
         if _get_result(games):
             total_result += _get_gameID(line)
 
-    print(total_result)
+        total_power += _get_power(games)
+
+    print(f"total_result: {total_result}, total power: {total_power}")
 
 
 def _get_gameID(line: str) -> int:
@@ -64,6 +67,34 @@ def _get_result(games: list[str]) -> bool:
                 return False
 
     return True
+
+
+def _get_power(games: list[str]) -> int:
+    dct: dict = _get_minimum_cubes(games)
+    total: int = 1
+    for item in dct:
+        total *= dct[item]
+
+    return total
+
+
+def _get_minimum_cubes(games: list[str]) -> dict[str, int]:
+    dct: dict[str, int] = {
+        "red": 1,
+        "green": 1,
+        "blue": 1,
+    }
+
+    for game in games:
+        dices: list[str] = game.split(",")
+        for dice in dices:
+            for color in dct:
+                if dice.find(color) != -1:
+                    txt: str = dice.replace(color, "")
+                    if dct[color] < int(txt.strip()):
+                        dct[color] = int(txt.strip())
+
+    return dct
 
 
 if __name__ == "__main__":
