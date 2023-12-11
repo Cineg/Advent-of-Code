@@ -14,6 +14,8 @@ class SchematicNumber:
     min_col: int = 0
     max_col: int = 0
 
+    star_location: tuple[int, int] | None = None
+
     def is_special_character_adjacent(self, data: list[str]) -> bool:
         self._get_boundaries(len(data), len(data[0]))
 
@@ -30,6 +32,7 @@ class SchematicNumber:
         for row in range(self.min_row, self.max_row):
             for col in range(self.min_col, self.max_col):
                 if data[row][col] == "*":
+                    self.star_location = row, col
                     return True
 
         return False
@@ -59,12 +62,39 @@ class SchematicNumber:
 def main() -> None:
     data: list[str] = INPUT.splitlines()
     schematics: list[SchematicNumber] = _get_numbers_coordinates(data)
+    schematics_multipliers: list[SchematicNumber] = []
     total: int = 0
+    gears_total: int = 0
+
+    used_indexes: dict = {}
+
     for item in schematics:
         if item.is_special_character_adjacent(data):
             total += item.number
+        if item.is_multiplier_adjacent(data):
+            schematics_multipliers.append(item)
+
+    left_pointer: int = 0
+    while left_pointer + 1 <= len(schematics_multipliers):
+        for right_pointer in range(left_pointer + 1, len(schematics_multipliers)):
+            if (
+                schematics_multipliers[left_pointer].star_location
+                == schematics_multipliers[right_pointer].star_location
+            ):
+                if left_pointer in used_indexes or right_pointer in used_indexes:
+                    pass
+                else:
+                    gears_total += (
+                        schematics_multipliers[left_pointer].number
+                        * schematics_multipliers[right_pointer].number
+                    )
+                    used_indexes[left_pointer] = left_pointer
+                    used_indexes[right_pointer] = right_pointer
+
+        left_pointer += 1
 
     print(total)
+    print(gears_total)
 
 
 def _get_numbers_coordinates(data: list[str]) -> list[SchematicNumber]:
