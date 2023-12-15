@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+import csv
 
 
 class Hand_Strength(Enum):
@@ -29,8 +30,17 @@ class Hand:
 
         if len(dct_cards) == 5:
             self.strength = Hand_Strength.high_card
+
+            if "J" in dct_cards:
+                self.strength = Hand_Strength.one_pair
+            return
+
         if len(dct_cards) == 4:
             self.strength = Hand_Strength.one_pair
+            if "J" in dct_cards:
+                self.strength = Hand_Strength.three_of_a_kind
+            return
+
         if len(dct_cards) == 3:
             is_three: bool = False
             for card in dct_cards:
@@ -42,16 +52,32 @@ class Hand:
             else:
                 self.strength = Hand_Strength.two_pair
 
+            if "J" in dct_cards:
+                if dct_cards["J"] == 3 or dct_cards["J"] == 2:
+                    self.strength = Hand_Strength.four_of_a_kind
+                else:
+                    if is_three:
+                        self.strength = Hand_Strength.four_of_a_kind
+                    else:
+                        self.strength = Hand_Strength.full_house
+            return
+
         if len(dct_cards) == 2:
             for card in dct_cards:
+                if "J" in dct_cards:
+                    self.strength = Hand_Strength.five_of_a_kind
+                    return
+
                 if dct_cards[card] == 3 or dct_cards[card] == 2:
                     self.strength = Hand_Strength.full_house
+                    return
                 else:
                     self.strength = Hand_Strength.four_of_a_kind
-                break
+                    return
 
         if len(dct_cards) == 1:
             self.strength = Hand_Strength.five_of_a_kind
+            return
 
 
 def main() -> None:
@@ -67,7 +93,6 @@ def main() -> None:
         index += 1
 
     sort_cards(hands)
-
     index: int = 1
     for hand in hands:
         hand_total: int = hand.bid * index
@@ -87,7 +112,7 @@ def isHand1Better(hand1: Hand, hand2: Hand) -> bool:
         "A": 14,
         "K": 13,
         "Q": 12,
-        "J": 11,
+        "J": 1,
         "T": 10,
         "9": 9,
         "8": 8,
