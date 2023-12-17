@@ -1,13 +1,15 @@
 def main():
     input: list[str] = open("Day 9 - Mirage Maintenance\input.txt").read().splitlines()
-    total: int = 0
+    total_left: int = 0
+    total_right: int = 0
 
     for line in input:
         row: list[int] = list(map(int, line.split()))
         total_triangle: list[list[int]] = list_triangle(row)
-        total += get_triangle_extrapolated_value(total_triangle)
+        total_left += get_triangle_extrapolated_value_first(total_triangle)
+        total_right += get_triangle_extrapolated_value(total_triangle)
 
-    print(total)
+    print(total_left, total_right)
 
 
 def list_triangle(row: list[int]) -> list[list[int]]:
@@ -44,6 +46,17 @@ def get_triangle_extrapolated_value(triangle: list[list[int]]) -> int:
         index += 1
 
     return triangle[0][-1]
+
+
+def get_triangle_extrapolated_value_first(triangle: list[list[int]]):
+    index: int = 0
+
+    while index < len(triangle) - 1:
+        value: int = triangle[-1 - index][0] - triangle[-2 - index][0]
+        triangle[-2 - index].insert(0, -value)
+        index += 1
+
+    return triangle[0][0]
 
 
 def is_list_zero(row: list[int]) -> bool:
