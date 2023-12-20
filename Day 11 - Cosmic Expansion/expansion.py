@@ -1,3 +1,6 @@
+VALUE = 1000000
+
+
 def main():
     input: list[str] = open("Day 11 - Cosmic Expansion\input.txt").read().splitlines()
 
@@ -16,15 +19,50 @@ def main():
             start_point: tuple[int, int] = galaxies_position[left_index]
             end_point: tuple[int, int] = galaxies_position[right_index]
 
-            distance_rows: int = abs(start_point[0] - end_point[0])
-            distance_columns: int = abs(start_point[1] - end_point[1])
+            total_distance += distance_vertical(
+                cosmic_map, start_point[1], start_point[0], end_point[0]
+            )
+            total_distance += distance_horizontal(
+                cosmic_map, start_point[0], start_point[1], end_point[1]
+            )
 
-            total_distance += distance_rows + distance_columns
             right_index += 1
 
         left_index += 1
 
     print(total_distance)
+
+
+def distance_vertical(
+    map: list[list[str]], column: int, row_start: int, row_end: int
+) -> int:
+    if row_end < row_start:
+        row_end, row_start = row_start, row_end
+
+    value: int = 0
+    for row in range(row_start, row_end):
+        if map[row][column] == "X":
+            value += VALUE
+        else:
+            value += 1
+
+    return value
+
+
+def distance_horizontal(
+    map: list[list[str]], row: int, col_start: int, col_end: int
+) -> int:
+    if col_end < col_start:
+        col_start, col_end = col_end, col_start
+
+    value: int = 0
+    for col in range(col_start, col_end):
+        if map[row][col] == "X":
+            value += VALUE
+        else:
+            value += 1
+
+    return value
 
 
 def _create_cosmic_map(input: list[str]) -> list[list[str]]:
@@ -50,26 +88,30 @@ def _update_cosmic_map(cosmic_map: list[list[str]]) -> list[list[str]]:
                 is_galaxy = True
                 break
 
-        temp_arr.append(row)
         if not is_galaxy:
-            temp_arr.append(row)
+            i: int = 0
+            while i < len(row):
+                row[i] = "X"
+                i += 1
+
+        temp_arr.append(row)
 
     # add columns
-    columns: int = 0
-
-    while columns < len(temp_arr[0]):
+    column: int = 0
+    while column < len(temp_arr[0]):
         is_galaxy = False
         for row in temp_arr:
-            if row[-1 + columns] == "#":
+            if row[column] == "#":
                 is_galaxy = True
                 break
 
         if not is_galaxy:
-            for row in temp_arr:
-                row.insert((-1 + columns), ".")
-            columns += 1
+            i: int = 0
+            while i < len(temp_arr):
+                temp_arr[i][column] = "X"
+                i += 1
 
-        columns += 1
+        column += 1
 
     return temp_arr
 
