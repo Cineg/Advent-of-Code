@@ -42,17 +42,41 @@ def main() -> None:
         open("Day 16 - The Floor Will Be Lava\input.txt").read().splitlines()
     )
     input_grid: list[list[str]] = convert_to_2D(input)
-    energized_board: list[list[Cell]] = get_empty_grid(input)
 
-    move(energized_board, input_grid, (0, 0), (1, 0))
+    max_result: int = 0
+    for row_index, _ in enumerate(input):
+        # down
+        energized_board: list[list[Cell]] = get_empty_grid(input)
+        move(energized_board, input_grid, (0, row_index), (1, 0))
+        max_result = max(max_result, calculate_energized(energized_board))
 
+        # up
+        energized_board: list[list[Cell]] = get_empty_grid(input)
+        move(energized_board, input_grid, (len(input_grid) - 1, row_index), (-1, 0))
+        max_result = max(max_result, calculate_energized(energized_board))
+
+    for col_index, _ in enumerate(input[0]):
+        # right
+        energized_board: list[list[Cell]] = get_empty_grid(input)
+        move(energized_board, input_grid, (col_index, 0), (0, 1))
+        max_result = max(max_result, calculate_energized(energized_board))
+
+        # left
+        energized_board: list[list[Cell]] = get_empty_grid(input)
+        move(energized_board, input_grid, (col_index, len(input_grid[0]) - 1), (0, -1))
+        max_result = max(max_result, calculate_energized(energized_board))
+
+    print(max_result)
+
+
+def calculate_energized(energized_board: list[list[Cell]]) -> int:
     counter: int = 0
     for row in energized_board:
         for cell in row:
             if cell.is_energized():
                 counter += 1
 
-    print(counter)
+    return counter
 
 
 def move(
