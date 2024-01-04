@@ -1,3 +1,6 @@
+from collections import Counter
+
+
 def main():
     input = open("Day 18 - Lavaduct Lagoon\input.txt").read().splitlines()
 
@@ -7,7 +10,24 @@ def main():
 
     fill_grid(grid, input, (start_y, start_x))
 
-    print(count_grid(grid))
+    fill_interior(grid, start_y - 1, start_x)
+
+    # with open(
+    #     "E:\Programming\Python\Advent of Code 2023\Day 18 - Lavaduct Lagoon\output.txt",
+    #     "w",
+    #     encoding="utf-8",
+    # ) as output:
+    #     for line in grid:
+    #         for character in line:
+    #             output.write(character)
+    #         output.write("\n")
+
+    counter: int = 0
+    for line in grid:
+        x = Counter(line)
+        counter += x["#"] + x["."]
+
+    print(counter)
 
 
 def get_grid_dimensions(input: list[str]) -> tuple[int, int, int, int]:
@@ -90,24 +110,27 @@ def fill_grid(grid: list[list[str]], input: list[str], start_pos: tuple[int, int
         current_y = next_y
 
 
-def count_grid(grid: list[list[str]]):
-    count: int = 0
-    for row, line in enumerate(grid):
-        in_bounds: bool = False
+def fill_interior(grid: list[list[str]], row: int, col: int):
+    fill_char: str = "."
+    queue: list = []
+    queue.append((row, col))
+    while queue:
+        row, col = queue.pop(0)
+        if (
+            row < 0
+            or row >= len(grid)
+            or col < 0
+            or col >= len(grid[0])
+            or grid[row][col] in [fill_char, "#"]
+        ):
+            continue
+        else:
+            grid[row][col] = fill_char
 
-        for col, value in enumerate(line):
-            if not in_bounds and value == "#":
-                in_bounds = True
-            elif in_bounds and value == "#":
-                if col + 1 < len(grid[0]) and col - 1 >= 0:
-                    if grid[row][col + 1] != "#" and grid[row][col - 1] != "#":
-                        in_bounds = False
-                        count += 1
-
-            if in_bounds:
-                count += 1
-
-    return count
+            queue.append((row + 1, col))
+            queue.append((row - 1, col))
+            queue.append((row, col + 1))
+            queue.append((row, col - 1))
 
 
 if __name__ == "__main__":
