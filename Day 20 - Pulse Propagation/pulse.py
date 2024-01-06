@@ -54,9 +54,17 @@ def main() -> None:
     # from; where; signal;
     queue: list[tuple[str, str, str]] = []
 
-    for _ in range(1000):
+    flag = True
+    i = 0
+    while flag:
+        i += 1
         queue = [("", "button", "low")]
         while queue:
+            if queue[0][1] == "rx" and queue[0][2] == "low":
+                print(i)
+                flag = False
+                break
+
             if queue[0][1] not in modules:
                 queue.pop(0)
                 continue
