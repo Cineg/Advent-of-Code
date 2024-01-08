@@ -3,26 +3,21 @@ class Brick:
         self.x_coordinates: list[int] = [startpos[0], endpos[0]]
         self.y_coordinates: list[int] = [startpos[1], endpos[1]]
         self.z_coordinates: list[int] = [startpos[2], endpos[2]]
-        self.start_z: int = startpos[2]
-        self.end_z: int
+        self.start_z = startpos[2]
         self.brick_name: str = name
 
     def update_z_coordinates(self, z_pos_level: int) -> None:
-        if z_pos_level > 0:
-            slide: int = abs(z_pos_level - self.z_coordinates[0])
-            self.z_coordinates[0] -= slide
-            self.z_coordinates[1] -= slide
-
-            self.end_z = self.z_coordinates[0]
+        self.z_coordinates[1] -= self.z_coordinates[0] - z_pos_level
+        self.z_coordinates[0] = z_pos_level
 
 
 def main():
     input: list[str] = open("Day 22 - Sand Slabs\input.txt").read().split("\n")
 
     snapshot: list[Brick] = get_bricks(input)
-    sorted(snapshot, key=lambda x: x.start_z)
+    snapshot.sort(key=lambda x: x.z_coordinates[0])
     fallen_bricks: list[Brick] = get_final_brick_pos(snapshot)
-    sorted(fallen_bricks, key=lambda x: x.end_z)
+    fallen_bricks.sort(key=lambda x: x.z_coordinates[0])
 
     supports: dict = {}
     get_support: dict = {}
@@ -33,18 +28,15 @@ def main():
         supports[brick.brick_name] = []
         get_support[brick.brick_name] = []
 
-    i: int = len(fallen_bricks) - 1
-    while i >= 0:
-        base_brick: Brick = fallen_bricks[i]
-        for j in range(i - 1, -1, -1):
-            fallen_brick: Brick = fallen_bricks[j]
-
-            if base_brick.z_coordinates[1] + 1 != fallen_brick.z_coordinates[0]:
-                continue
-            if is_in_bounds(base_brick, fallen_brick):
-                get_support[fallen_brick.brick_name].append(base_brick.brick_name)
-                supports[base_brick.brick_name].append(fallen_brick.brick_name)
-        i -= 1
+    i: int = 0
+    for i, upper_brick in enumerate(fallen_bricks):
+        for j, lower_brick in enumerate(fallen_bricks[:i]):
+            if (
+                is_in_bounds(lower_brick, upper_brick)
+                and lower_brick.z_coordinates[1] + 1 == upper_brick.z_coordinates[0]
+            ):
+                get_support[upper_brick.brick_name].append(lower_brick.brick_name)
+                supports[lower_brick.brick_name].append(upper_brick.brick_name)
 
     for key in get_support:
         to_disintegrate: bool = True
@@ -64,8 +56,6 @@ def main():
 
     print(len(disintegrate))
 
-    print("UwU")
-
 
 def get_bricks(input: list[str]) -> list[Brick]:
     bricks: list = []
@@ -80,13 +70,11 @@ def get_bricks(input: list[str]) -> list[Brick]:
 
 
 def is_in_bounds(base_brick: Brick, falling_brick: Brick) -> bool:
-    if base_brick.x_coordinates[1] < falling_brick.x_coordinates[0]:
-        return False
-
-    if base_brick.y_coordinates[1] < falling_brick.y_coordinates[0]:
-        return False
-
-    return True
+    return max(base_brick.x_coordinates[0], falling_brick.x_coordinates[0]) <= min(
+        base_brick.x_coordinates[1], falling_brick.x_coordinates[1]
+    ) and max(base_brick.y_coordinates[0], falling_brick.y_coordinates[0]) <= min(
+        base_brick.y_coordinates[1], falling_brick.y_coordinates[1]
+    )
 
 
 def get_final_brick_pos(snapshot: list[Brick]) -> list[Brick]:
