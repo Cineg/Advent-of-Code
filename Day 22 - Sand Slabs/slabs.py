@@ -11,7 +11,7 @@ class Brick:
         self.z_coordinates[0] = z_pos_level
 
 
-def main():
+def main() -> None:
     input: list[str] = open("Day 22 - Sand Slabs\input.txt").read().split("\n")
 
     snapshot: list[Brick] = get_bricks(input)
@@ -54,7 +54,42 @@ def main():
         if to_disintegrate:
             disintegrate.append(key)
 
-    print(len(disintegrate))
+    print(chain_reaction(get_support, supports))
+
+
+def chain_reaction(supported_by: dict, is_supporting: dict) -> int:
+    total = 0
+
+    for start_brick in supported_by:
+        queue: list[str] = []
+        falling_bricks: list[str] = []
+
+        queue.append(start_brick)
+        falling_bricks.append(start_brick)
+
+        while queue:
+            supported_bricks: list[str] = is_supporting[queue[0]]
+            queue.pop(0)
+
+            for supported_brick in supported_bricks:
+                supported_brick_support_count: int = len(supported_by[supported_brick])
+                for additional_support_bricks in supported_by[supported_brick]:
+                    if (
+                        additional_support_bricks == supported_brick
+                        or additional_support_bricks in falling_bricks
+                    ):
+                        supported_brick_support_count -= 1
+
+                if supported_brick_support_count == 0:
+                    if supported_brick not in queue:
+                        queue.append(supported_brick)
+
+                    if supported_brick not in falling_bricks:
+                        falling_bricks.append(supported_brick)
+
+        total += len(falling_bricks) - 1
+
+    return total
 
 
 def get_bricks(input: list[str]) -> list[Brick]:
