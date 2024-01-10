@@ -35,7 +35,7 @@ def main():
             vals.append(len(path.seen) - 1)
             continue
 
-        if grid[path.row][path.col] == ".":
+        if grid[path.row][path.col] != "#":
             for dir in ((0, 1), (0, -1), (1, 0), (-1, 0)):
                 new_row: int = path.row + dir[0]
                 new_col: int = path.col + dir[1]
@@ -49,32 +49,32 @@ def main():
                         new_path.seen.add((new_row, new_col))
                         queue.append(new_path)
 
-        if (
-            grid[path.row][path.col] == "^"
-            and (path.row - 1, path.col) not in path.seen
-        ):
-            path.row = -1
-            queue.append(path)
-        if (
-            grid[path.row][path.col] == ">"
-            and (path.row, path.col + 1) not in path.seen
-        ):
-            path.col += 1
-            queue.append(path)
+        # if (
+        #     grid[path.row][path.col] == "^"
+        #     and (path.row - 1, path.col) not in path.seen
+        # ):
+        #     path.row = -1
+        #     queue.append(path)
+        # if (
+        #     grid[path.row][path.col] == ">"
+        #     and (path.row, path.col + 1) not in path.seen
+        # ):
+        #     path.col += 1
+        #     queue.append(path)
 
-        if (
-            grid[path.row][path.col] == "v"
-            and (path.row + 1, path.col) not in path.seen
-        ):
-            path.row += 1
-            queue.append(path)
+        # if (
+        #     grid[path.row][path.col] == "v"
+        #     and (path.row + 1, path.col) not in path.seen
+        # ):
+        #     path.row += 1
+        #     queue.append(path)
 
-        if (
-            grid[path.row][path.col] == "<"
-            and (path.row, path.col - 1) not in path.seen
-        ):
-            path.col -= 1
-            queue.append(path)
+        # if (
+        #     grid[path.row][path.col] == "<"
+        #     and (path.row, path.col - 1) not in path.seen
+        # ):
+        #     path.col -= 1
+        #     queue.append(path)
 
     print(max(vals))
 
