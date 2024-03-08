@@ -1,5 +1,5 @@
 def main():
-    input: list[str] = open("Day 1\input.txt").read().split("\n\n")
+    input: list[str] = open("Advent of Code 2022\Day 1\input.txt").read().split("\n\n")
 
     max_calorie: int = 0
     for item in input:
