@@ -15,6 +15,7 @@ var input string
 func main() {
 	l1, l2 := readFile()
 	fmt.Println(part1(l1, l2))
+	fmt.Println(part2(l1, l2))
 }
 
 func part1(l1, l2 []int) int {
@@ -29,6 +30,27 @@ func part1(l1, l2 []int) int {
 		}
 		ans += diff
 	}
+	return ans
+}
+
+func part2(l1, l2 []int) int {
+	map1 := make(map[int]int)
+	map2 := make(map[int]int)
+
+	for i := range len(l1) {
+		map1[l1[i]] += 1
+		map2[l2[i]] += 1
+	}
+
+	ans := 0
+	for key, value := range map1 {
+		multiplier := map2[key]
+
+		fmt.Println(multiplier)
+
+		ans += multiplier * key * value
+	}
+
 	return ans
 }
 
