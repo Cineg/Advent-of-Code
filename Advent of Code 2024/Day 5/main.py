@@ -27,6 +27,23 @@ def day1() -> int:
     return total
 
 
+def day2() -> int:
+    page_order, page_queue = data.split("\n\n")
+    order: dict[int, Node] = get_page_order(page_order)
+    order = _update_order(order, True)
+    order = _update_order(order, False)
+
+    total = 0
+    pq: list[str] = page_queue.split("\n")
+    for q in pq:
+        queue: list[int] = [int(item) for item in q.split(",")]
+        if not is_correct_order(queue, order):
+            new_q: list[int] = sort_q(queue, order)
+            total += queue[round(len(new_q) // 2)]
+
+    return total
+
+
 def get_page_order(page_order: str) -> dict[int, Node]:
     data: dict = {}
     instructions: list[str] = page_order.split("\n")
@@ -44,6 +61,12 @@ def get_page_order(page_order: str) -> dict[int, Node]:
     return data
 
 
+def is_correct(prev: Node, after: Node) -> bool:
+    if prev.page_number in after.before:
+        return False
+    return True
+
+
 def is_correct_order(page_queue: list[int], order: dict[int, Node]):
     i = 0
     while i < len(page_queue) - 1:
@@ -55,6 +78,18 @@ def is_correct_order(page_queue: list[int], order: dict[int, Node]):
         i += 1
 
     return True
+
+
+def sort_q(queue: list[int], order: dict[int, Node]) -> list[int]:
+    for i in range(len(queue)):
+        for j in range(len(queue)):
+            if i == j:
+                continue
+
+            if not is_correct(order[queue[i]], order[queue[j]]):
+                queue[i], queue[j] = queue[j], queue[i]
+
+    return queue
 
 
 def _update_order(data: dict[int, Node], before_after: bool) -> dict[int, Node]:
@@ -97,3 +132,4 @@ def _update_order(data: dict[int, Node], before_after: bool) -> dict[int, Node]:
 
 if __name__ == "__main__":
     print(day1())
+    print(day2())
