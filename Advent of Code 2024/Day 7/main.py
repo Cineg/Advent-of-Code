@@ -31,5 +31,32 @@ def day1() -> int:
     return total
 
 
+def day2():
+    total: int = 0
+    for row in data:
+        result, items = row.split(": ")
+        result = int(result)
+
+        numbers = deque([int(i) for i in items.split(" ")])
+
+        results: list[int] = [numbers.popleft()]
+        while numbers:
+            num = numbers.popleft()
+            temp: list[int] = []
+            while results:
+                x: int = results.pop()
+                temp.append(num * x)
+                temp.append(num + x)
+                temp.append(int(str(x) + str(num)))
+
+            results = temp
+
+        if result in results:
+            total += result
+
+    return total
+
+
 if __name__ == "__main__":
     print(day1())
+    print(day2())
