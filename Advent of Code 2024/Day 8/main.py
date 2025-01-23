@@ -26,6 +26,29 @@ def part1() -> int:
     return total
 
 
+def part2() -> int:
+    grid: list[list[str]] = _get_grid()
+    nodes: dict[str, set[tuple[int, int]]] = _get_nodes(grid)
+
+    antinodes = set()
+    for node_list in nodes.values():
+        antinodes.update(_get_antinodes(node_list, len(grid[0]), len(grid)))
+
+    total: int = 0
+    for antinode in antinodes:
+        if (
+            antinode[0] < 0
+            or antinode[0] >= len(grid[0])
+            or antinode[1] < 0
+            or antinode[1] >= len(grid)
+        ):
+            continue
+
+        total += 1
+
+    return total
+
+
 def _get_nodes(grid: list[list[str]]) -> dict[str, set[tuple[int, int]]]:
     data: dict[str, set[tuple[int, int]]] = {}
     for row_index, row in enumerate(grid):
@@ -39,7 +62,9 @@ def _get_nodes(grid: list[list[str]]) -> dict[str, set[tuple[int, int]]]:
     return data
 
 
-def _get_antinodes(nodes: set[tuple[int, int]]) -> set[tuple[int, int]]:
+def _get_antinodes(
+    nodes: set[tuple[int, int]], r_bound, c_bound
+) -> set[tuple[int, int]]:
     i: int = 0
     nodes_list = list(nodes)
 
@@ -57,8 +82,27 @@ def _get_antinodes(nodes: set[tuple[int, int]]) -> set[tuple[int, int]]:
             curr_r = r_diff if current[0] > nodes_list[n][0] else -r_diff
             curr_c = c_diff if current[1] > nodes_list[n][1] else -c_diff
 
-            antinodes.add((current[0] + curr_r, current[1] + curr_c))
-            antinodes.add((nodes_list[n][0] - curr_r, nodes_list[n][1] - curr_c))
+            r = current[0] + curr_r
+            c = current[1] + curr_c
+
+            while True:
+                if r < 0 or r >= r_bound or c < 0 or c >= c_bound:
+                    break
+
+                antinodes.add((c, r))
+                c += curr_c
+                r += curr_r
+
+            r = current[0] + curr_r
+            c = current[1] + curr_c
+
+            while True:
+                if r < 0 or r >= r_bound or c < 0 or c >= c_bound:
+                    break
+
+                antinodes.add((c, r))
+                c -= curr_c
+                r -= curr_r
 
         i += 1
 
@@ -78,4 +122,5 @@ def _get_grid() -> list[list[str]]:
 
 
 if __name__ == "__main__":
-    print(part1())
+    # print(part1())
+    print(part2())
