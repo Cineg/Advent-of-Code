@@ -16,7 +16,7 @@ def day1() -> int:
 
         results: list[int] = [numbers.popleft()]
         while numbers:
-            num = numbers.popleft()
+            num: int = numbers.popleft()
             temp: list[int] = []
             while results:
                 x: int = results.pop()
@@ -31,7 +31,7 @@ def day1() -> int:
     return total
 
 
-def day2():
+def day2() -> int:
     total: int = 0
     for row in data:
         result, items = row.split(": ")
@@ -41,7 +41,7 @@ def day2():
 
         results: list[int] = [numbers.popleft()]
         while numbers:
-            num = numbers.popleft()
+            num: int = numbers.popleft()
             temp: list[int] = []
             while results:
                 x: int = results.pop()
