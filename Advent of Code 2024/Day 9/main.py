@@ -1,9 +1,10 @@
+from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 
 
-data = open(Path(Path(__file__).parent, "input.txt"), "r").read()
+data: str = open(Path(Path(__file__).parent, "input.txt"), "r").read()
 
 
 @dataclass
@@ -13,7 +14,7 @@ class Node:
     isFile: bool = False
 
 
-def part1():
+def part1() -> int:
     indexes = [Node(idx // 2, int(i), idx % 2 == 0) for idx, i in enumerate(data)]
     checksum: int = 0
 
@@ -51,6 +52,59 @@ def part1():
     return checksum
 
 
+def part2():
+    blanks: list[tuple[int, int]] = []
+    files: dict[int, tuple[int, int]] = {}
+    fid: int = 0
+    position: int = 0
+
+    for index, char in enumerate(data):
+        space = int(char)
+        if index % 2 == 0:
+            if space == 0:
+                raise ValueError("?")
+            files[fid] = (position, space)
+            fid += 1
+        else:
+            if space != 0:
+                blanks.append((position, space))
+
+        position += space
+
+    while fid > 0:
+        fid -= 1
+        pos, size = files[fid]
+
+        i = 0
+        while i < len(blanks):
+            start, length = blanks[i]
+            if start > pos:
+                blanks.pop()
+                break
+
+            if length < size:
+                i += 1
+                continue
+
+            if size <= length:
+                if size == length:
+                    blanks.pop(i)
+                else:
+                    blanks[i] = (start + size, length - size)
+
+                files[fid] = (start, size)
+                break
+
+            i += 1
+
+    total = 0
+    for id, (start, size) in files.items():
+        for i in range(start, start + size):
+            total += id * i
+
+    return total
+
+
 def _get_right_data(indexes) -> Node:
     data = indexes.pop() if len(indexes) > 0 else Node(-1, -1, False)
     if data.isFile:
@@ -61,3 +115,4 @@ def _get_right_data(indexes) -> Node:
 
 if __name__ == "__main__":
     print(part1())
+    print(part2())
